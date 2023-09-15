@@ -52,7 +52,8 @@ def lock_shape(field, shape, px, py):
     """Merge shape into the field"""
     for i in range(len(shape)):
         for j in range(len(shape[0])):
-            field[i + py][j + px] = shape[i][j]
+            if shape[i][j] != '.':
+                field[i + py][j + px] = shape[i][j]
 
 def is_collide(field: list[list[str]], shape: list[list[str]], px: int, py: int) -> bool:
     """Check if the shape in given position is collided to the field"""
