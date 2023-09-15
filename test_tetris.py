@@ -58,5 +58,42 @@ class TestTetris(unittest.TestCase):
         ]
         self.assertEqual(tetris.is_collide(field, shape, 0, 0), True)
 
+        shape = [
+            'X..',
+            'X..',
+            'X..',
+            'XXX'
+        ]
+        field = [
+            '.....',
+            '.....',
+            '.....',
+            '.....',
+            '.....',
+            '.....'
+        ]
+        self.assertEqual(tetris.is_collide(field, shape, 0, 0), False)
+
+    def test_lock_shape(self):
+        shape = [
+            '.XX',
+            'X.X',
+            'XXX'
+        ]
+        field = [
+            list('A..'),
+            list('A..'),
+            list('A..'),
+            list('A..'),
+        ]
+        expected = [
+            list('AXX'),
+            list('X.X'),
+            list('XXX'),
+            list('A..')
+        ]
+        tetris.lock_shape(field, shape, 0, 0)
+        self.assertEqual(field, expected)
+
 if __name__ == '__main__':
     unittest.main()
