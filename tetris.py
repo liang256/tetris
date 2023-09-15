@@ -63,7 +63,7 @@ def is_collide(field: list[list[str]], shape: list[list[str]], px: int, py: int)
             if i + py < 0 or i + py >= rows or j + px < 0 or j + px >= cols:
                 return True
                 
-            if field[i + py][j + px] == shape[i][j]:
+            if shape[i][j] == 'X' and field[i + py][j + px] == shape[i][j]:
                 return True
 
     return False
