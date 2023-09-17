@@ -13,7 +13,7 @@ def main(stdscr):
             break
 
 def start_game(stdscr):
-    width = 10
+    width = 12
     height = 15
 
     # freqency to auto move down the shape
@@ -29,6 +29,8 @@ def start_game(stdscr):
     timer = 0
     score = 0
     rotate_key = 'z'
+    quit_key = 'q'
+    pause = False
 
     # Set the input mode to non-blocking
     stdscr.nodelay(1)
@@ -61,13 +63,23 @@ def start_game(stdscr):
         ],
     ]
 
+    px = py = 0 # current position of the current shape
     curr_shape = shapes[random.randint(0, len(shapes) - 1)]
     field = [['.'] * width for _ in range(height)]
 
     rerender(stdscr, field, score)
 
-    px = py = 0 # current position of the current shape
     while 1:
+
+        if pause:
+            stdscr.nodelay(0)
+
+            if stdscr.getch() == ord('p'):
+                pause = False
+                stdscr.nodelay(1)
+            
+            continue
+
         time.sleep(0.001)
         timer += 1
 
@@ -80,13 +92,21 @@ def start_game(stdscr):
 
             lock_shape(field, s, px, py)
 
+            over_shape = [
+                list('------------'),
+                list(' Game Over  '),
+                list('------------'),
+            ]
+
+            lock_shape(
+                field,
+                over_shape,
+                max(0, width - len(over_shape[0])) // 2,
+                max(0, height - len(over_shape)) // 2
+            )
+
             rerender(stdscr, field, score)
 
-            stdscr.addstr(height + 2, 0, 'Game Over')
-            stdscr.addstr(height + 3, 0, 'hit "r" to restart, any key to quit.')
-
-            stdscr.refresh()
-            
             break
 
         # lock the shape when it already reach the bottom
@@ -134,7 +154,13 @@ def start_game(stdscr):
 
         # keyboard event
         key = stdscr.getch()
-        if key == curses.KEY_LEFT and not is_collide(field, curr_shape, px - 1, py):
+
+        if key == ord(quit_key) or key == curses.KEY_EXIT:
+            break
+        elif key == ord('p'):
+            pause = True
+            continue
+        elif key == curses.KEY_LEFT and not is_collide(field, curr_shape, px - 1, py):
             px -= 1
         elif key == curses.KEY_RIGHT and not is_collide(field, curr_shape, px + 1, py):
             px += 1
@@ -169,6 +195,9 @@ def start_game(stdscr):
         rerender(stdscr, buf, score)
 
     # game ends
+    stdscr.addstr(height + 3, 0, 'hit "r" to restart, any key to quit.')
+    stdscr.refresh()
+
     stdscr.nodelay(0)
 
 def rotate_90_clockwise(matrix):
@@ -219,11 +248,18 @@ def rerender(stdscr, field: list[list[str]], score):
     It will automatically add a width 1 border when rendering
     """
     h, w = len(field), len(field[0])
+    indent = 5
+    
     stdscr.clear()
-    stdscr.addstr('#' * (w + 2) + '   score: ' + str(score))
+
+    stdscr.addstr('#' * (w + 2))
     for r in range(h):
         stdscr.addstr(r + 1, 0, '#{}#'.format(''.join(field[r])))
     stdscr.addstr(h + 1, 0, '#' * (w + 2))
+
+    stdscr.addstr(0, w + indent, 'score: ' + str(score))
+    stdscr.addstr(h + 3, 0, '"z" rotate, "p" pause, "q" exit')
+
     stdscr.refresh()
 
 if __name__ == '__main__':
