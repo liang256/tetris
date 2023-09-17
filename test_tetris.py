@@ -74,6 +74,18 @@ class TestTetris(unittest.TestCase):
         ]
         self.assertEqual(tetris.is_collide(field, shape, 0, 0), False)
 
+        shape = [
+            'X..',
+            'X..',
+            'X..',
+        ]
+        field = [
+            '..',
+            '..',
+            '..'
+        ]
+        self.assertEqual(tetris.is_collide(field, shape, 0, 0), False)
+
     def test_lock_shape(self):
         shape = [
             '.XX',

@@ -99,9 +99,14 @@ def main(stdscr):
         if timer % speed == 0 and py + 1 < height:
             py += 1
 
+        # render out the current shape and field
         buf = copy.deepcopy(field)
         for i in range(len(shapes[shape_i])):
             for j in range(len(shapes[shape_i][0])):
+                if i + py < 0 or i + py >= height or j + px < 0 or j + px >= width:
+                    # a part of empty shape is outside the field but it's fine
+                    # just not copy the cell to the field
+                    continue
                 buf[i + py][j + px] = 'X' if shapes[shape_i][i][j] == 'X' else buf[i + py][j + px]
         rerender(stdscr, buf)
 
@@ -120,7 +125,9 @@ def is_collide(field: list[list[str]], shape: list[list[str]], px: int, py: int)
     for i in range(len(shape)):
         for j in range(len(shape[0])):
             if i + py < 0 or i + py >= rows or j + px < 0 or j + px >= cols:
-                return True
+                if shape[i][j] == 'X':
+                    return True
+                continue # cell of the shape is outside the field but is empty which is fine
                 
             if shape[i][j] == 'X' and field[i + py][j + px] == shape[i][j]:
                 return True
