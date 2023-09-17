@@ -107,5 +107,14 @@ class TestTetris(unittest.TestCase):
         tetris.lock_shape(field, shape, 0, 0)
         self.assertEqual(field, expected)
 
+    def test_get_full_rows(self):
+        filed = [
+            list('XXX'),
+            list('X..'),
+            list('XXX'),
+            list('...')
+        ]
+        self.assertEqual(tetris.get_full_rows(filed), [0, 2])
+
 if __name__ == '__main__':
     unittest.main()

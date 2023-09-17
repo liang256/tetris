@@ -5,11 +5,12 @@ import copy
 import random
 
 def main(stdscr):
-    width = 20
-    height = 20
+    width = 10
+    height = 15
     speed = 20 # move down per 'speed' * 0.01 sec
     timer = 0
     shape_i = 0
+    score = 0
 
     # Set the input mode to non-blocking
     stdscr.nodelay(1)
@@ -47,7 +48,7 @@ def main(stdscr):
     ]
 
     field = [['.'] * width for _ in range(height)]
-    rerender(stdscr, field)
+    rerender(stdscr, field, score)
 
     px = py = 0 # current position of the current shape
     while 1:
@@ -57,7 +58,7 @@ def main(stdscr):
                 s = s[1:]
 
             lock_shape(field, s, px, py)
-            rerender(stdscr, field)
+            rerender(stdscr, field, score)
             stdscr.addstr(height + 2, 0, 'Game Over')
             break
 
@@ -65,9 +66,41 @@ def main(stdscr):
             # lock_shape and init position
             lock_shape(field, shapes[shape_i], px, py)
 
+            # get full rows
+            full_rows = get_full_rows(field)
+
+            # replace texture of full rows for UX
+            for r in full_rows:
+                field[r] = ['*'] * width
+
+            rerender(stdscr, field, score)
+
+            # let the full '*' rows shows for a sec
+            time.sleep(0.1)
+
+            # remove full rows
+            tmp = []
+
+            # copy all rows except full ones from field to tmp
+            for i in range(height - 1, -1, -1):
+                if i in full_rows:
+                    continue
+                tmp.append(field[i])
+
+            # fill the tmp to height
+            while len(tmp) < height:
+                tmp.append(['.'] * width)
+
+            field = tmp[::-1]
+
+            # add scores
+            score += len(full_rows)
+
             # init position and iterate to the next shape
             px = py = 0
             shape_i = random.randint(0, len(shapes) - 1)
+
+            rerender(stdscr, field, score)
 
             continue
 
@@ -108,9 +141,19 @@ def main(stdscr):
                     # just not copy the cell to the field
                     continue
                 buf[i + py][j + px] = 'X' if shapes[shape_i][i][j] == 'X' else buf[i + py][j + px]
-        rerender(stdscr, buf)
+        rerender(stdscr, buf, score)
 
     stdscr.getch() # hit any key to exit the game
+
+def get_full_rows(field):
+    rows, cols = len(field), len(field[0])
+    res = []
+
+    for r in range(rows):
+        if ''.join(field[r]) == 'X' * cols:
+            res.append(r)
+
+    return res
 
 def lock_shape(field, shape, px, py):
     """Merge shape into the field"""
@@ -134,14 +177,14 @@ def is_collide(field: list[list[str]], shape: list[list[str]], px: int, py: int)
 
     return False
 
-def rerender(stdscr, field: list[list[str]]):
+def rerender(stdscr, field: list[list[str]], score):
     """Re-render the field to the console
     
     It will automatically add a width 1 border when rendering
     """
     h, w = len(field), len(field[0])
     stdscr.clear()
-    stdscr.addstr('#' * (w + 2))
+    stdscr.addstr('#' * (w + 2) + '   score: ' + str(score))
     for r in range(h):
         stdscr.addstr(r + 1, 0, '#{}#'.format(''.join(field[r])))
     stdscr.addstr(h + 1, 0, '#' * (w + 2))
