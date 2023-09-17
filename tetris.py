@@ -2,6 +2,7 @@ import curses
 import time
 import sys
 import copy
+import random
 
 def main(stdscr):
     width = 20
@@ -63,7 +64,7 @@ def main(stdscr):
 
             # init position and iterate to the next shape
             px = py = 0
-            shape_i = 0 if shape_i + 1 == len(shapes) else shape_i + 1
+            shape_i = random.randint(0, len(shapes) - 1)
 
             continue
 
