@@ -7,9 +7,12 @@ import random
 def main(stdscr):
     width = 20
     height = 20
-    speed = 5 # move down per 'speed' * 0.01 sec
+    speed = 20 # move down per 'speed' * 0.01 sec
     timer = 0
     shape_i = 0
+
+    # Set the input mode to non-blocking
+    stdscr.nodelay(1)
 
     shapes = [
         [
@@ -70,9 +73,30 @@ def main(stdscr):
 
         time.sleep(0.01)
         timer += 1
+
+        # keyboard event
+        key = stdscr.getch()
+        if key == curses.KEY_LEFT and not is_collide(field, shapes[shape_i], px - 1, py):
+            px -= 1
+        elif key == curses.KEY_RIGHT and not is_collide(field, shapes[shape_i], px + 1, py):
+            px += 1
+        elif key == curses.KEY_DOWN:
+            if not is_collide(field, shapes[shape_i], px, py + 1):
+                py += 1
+            else:
+                # lock_shape and init position
+                lock_shape(field, shapes[shape_i], px, py)
+
+                # init position and iterate to the next shape
+                px = py = 0
+                shape_i = random.randint(0, len(shapes) - 1)
+
+        elif key == ord('z'):
+            # rotate
+            pass
         
         # force go down
-        if timer % speed == 0:
+        if timer % speed == 0 and py + 1 < height:
             py += 1
 
         buf = copy.deepcopy(field)
