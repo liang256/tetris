@@ -65,11 +65,11 @@ def start_game(stdscr):
 
         # ends the game if initial shape is collided
         if px == 0 and py == 0 and is_collide(field, curr_shape, px, py):
-            s = copy.deepcopy(curr_shape)
-            while s and is_collide(field, s, px, py):
-                s = s[1:]
 
-            lock_shape(field, s, px, py)
+            while curr_shape and is_collide(field, curr_shape, px, py):
+                curr_shape = curr_shape[1:]
+
+            lock_shape(field, curr_shape, px, py)
 
             over_shape = [
                 list("------------"),
