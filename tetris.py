@@ -96,32 +96,33 @@ def start_game(stdscr):
             # get full rows
             full_rows = get_full_rows(field)
 
-            # replace texture of full rows for UX
-            for row in full_rows:
-                field[row] = ["*"] * width
+            if full_rows:
+                # replace texture of full rows for UX
+                for row in full_rows:
+                    field[row] = ["*"] * width
 
-            rerender(stdscr, field, score)
+                rerender(stdscr, field, score)
 
-            # let the full '*' rows shows for a sec
-            time.sleep(0.1)
+                # let the full '*' rows shows for a sec
+                time.sleep(0.1)
 
-            # remove full rows
-            tmp = []
+                # remove full rows
+                tmp = []
 
-            # copy all rows except full ones from field to tmp
-            for i in range(height - 1, -1, -1):
-                if i in full_rows:
-                    continue
-                tmp.append(field[i])
+                # copy all rows except full ones from field to tmp
+                for i in range(height - 1, -1, -1):
+                    if i in full_rows:
+                        continue
+                    tmp.append(field[i])
 
-            # fill the tmp to height
-            while len(tmp) < height:
-                tmp.append(["."] * width)
+                # fill the tmp to height
+                while len(tmp) < height:
+                    tmp.append(["."] * width)
 
-            field = tmp[::-1]
+                field = tmp[::-1]
 
-            # add scores
-            score += len(full_rows)
+                # add scores
+                score += len(full_rows) * (1 << (len(full_rows) - 1))
 
             # init position and iterate to the next shape
             px = py = 0
