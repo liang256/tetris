@@ -116,5 +116,17 @@ class TestTetris(unittest.TestCase):
         ]
         self.assertEqual(tetris.get_full_rows(filed), [0, 2])
 
+    def test_rotate_90_clockwise(self):
+        m = [
+            [1,1,1],
+            [0,1,0]
+        ]
+        expected = [
+            [0,1],
+            [1,1],
+            [0,1]
+        ]
+        self.assertEqual(tetris.rotate_90_clockwise(m), expected)
+
 if __name__ == '__main__':
     unittest.main()
